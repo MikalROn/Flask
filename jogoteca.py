@@ -29,5 +29,8 @@ def criar():
     jogo = Jogo(nome, categoria, console)
     lista.append(jogo)
     return redirect('/')
+@app.route('/login')
+def login():
+    return render_template('template.html')
 
 app.run(debug=True)
