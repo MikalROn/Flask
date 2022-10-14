@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, flash
+from flask import Flask, render_template, request, redirect, session, flash, url_for
 
 
 class Jogo:
@@ -17,19 +17,19 @@ app = Flask(__name__)
 app.secret_key = 'Miguel'
 
 
-@app.route('/')
+@app.route(url_for('index'))
 def index():
     return render_template('lista.html', titulo='Jogos', jogos=lista)
 
 
-@app.route('/novo')
+@app.route(url_for('novo'))
 def novo():
     if 'usuario_logado' not in session or session['usuario_logado'] == None:
-        return redirect('/login')
+        return redirect('/login?proxima=novo')
     return render_template('novo.html', titulo='Novo Jogo')
 
 
-@app.route('/criar', methods=['POST', ])
+@app.route(url_for('criar'), methods=['POST', ])
 def criar():
     nome = request.form['nome']
     categoria = request.form['categoria']
@@ -39,17 +39,19 @@ def criar():
     return redirect('/')
 
 
-@app.route('/login')
+@app.route(url_for('login'))
 def login():
-    return render_template('login.html')
+    proxima = request.args.get('proxima')
+    return render_template('login.html', proxima=proxima)
 
 
-@app.route('/autenticar', methods=['POST', ])
+@app.route(url_for('autenticar'), methods=['POST', ])
 def autenticar():
     if 'key' == request.form['senha']:
         session['usuario_logado'] = request.form['usuario']
         flash(f'{session["usuario_logado"]} logado com sucesso!')
-        return redirect('/')
+        proxima_pagnia = request.form['proxima']
+        return redirect(f'/{proxima_pagnia}')
     else:
         return redirect('/login')
 
